@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="WorldMap:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/WorldMap_jar</output-path>
+    <root id="archive" name="WorldMap.jar">
+      <element id="module-output" name="WorldMap" />
+    </root>
+  </artifact>
+</component>
