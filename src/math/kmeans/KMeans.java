@@ -1,20 +1,17 @@
-package colors.kmeans;
+package math.kmeans;
 
-import colors.LABColor;
-import colors.test.Palette;
-
-import java.io.IOException;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
+/**
+ * Credit to https://stackabuse.com/guide-to-k-means-clustering-with-java/
+ */
 public class KMeans {
 
-    static final Double PRECISION = 0.0;
+    static final Double PRECISION = 0.01;
 
     /* K-Means++ implementation, initializes K centroids from data */
-    static <A> LinkedList<IDataEntry<A>> kmeanspp(DataSet<A> data, int K) {
+    public static <A> LinkedList<IDataEntry<A>> kMeansPP(DataSet<A> data, int K) {
         LinkedList<IDataEntry<A>> centroids = new LinkedList<>();
 
         centroids.add(data.randomFromDataSet());
@@ -27,11 +24,11 @@ public class KMeans {
 
     /* K-Means itself, it takes a dataset and a number K and adds class numbers
      * to records in the dataset */
-    static <A> void kmeans(DataSet<A> data, int K) {
+    public static <A> void kMeans(DataSet<A> data, int K) {
         // select K initial centroids
-        List<IDataEntry<A>> centroids = kmeanspp(data, K);
+        List<IDataEntry<A>> centroids = kMeansPP(data, K);
 
-        // initialize Sum of Squared Errors to max, we'll lower it at each iteration
+        // initAfterSetup Sum of Squared Errors to max, we'll lower it at each iteration
         Double SSE = Double.MAX_VALUE;
 
         while (true) {
@@ -63,29 +60,6 @@ public class KMeans {
                 break;
             }
             SSE = newSSE;
-        }
-    }
-
-    public static void main(String[] args) {
-        try {
-            // read data
-            Palette p = new Palette();
-            DataSet<DataSet.ColorPoint<LABColor>> data = DataSet.fromPalette(p);
-
-            // cluster
-            kmeans(data, 2);
-
-            Map<Integer, Integer> colorToColorMap = new HashMap<>();
-
-            for(var c : data.getColorPoints()){
-                var centroid = data.getLastCentroids().get(c.getClusterNo());
-                colorToColorMap.put(c.cast().getColor().asRGB().toInt(),centroid.cast().getColor().asRGB().toInt());
-            }
-
-
-
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 

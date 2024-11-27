@@ -1,10 +1,10 @@
-package colors;
+package math.colors;
 
 public class LUVColor extends BaseColor<LUVColor> {
 
     public LUVColor(float l, float u, float v, float alpha) {
         super(l, u, v, alpha);
-        //LAB can have a,b negative values
+        //LAB can have a,b negative getValues
     }
 
     @Override
@@ -29,12 +29,6 @@ public class LUVColor extends BaseColor<LUVColor> {
         return v3;
     }
 
-
-    @Override
-    public LUVColor with(float v1, float v2, float v3, float v4) {
-        return new LUVColor(v1,v2,v3,v4);
-    }
-
     public LUVColor withLuminance(float luminance) {
         return new LUVColor(luminance, u(), v(), alpha());
     }
@@ -51,10 +45,9 @@ public class LUVColor extends BaseColor<LUVColor> {
         return new LUVColor(luminance(), u(), v(), alpha);
     }
 
-    @Override
-    public LUVColor averageColors(LUVColor... colors) {
-        float size = colors.length + 1;
-        float r = this.luminance(), g = this.u(), b = this.v(), a = this.alpha();
+    public static LUVColor averageColors(LUVColor... colors) {
+        float size = colors.length;
+        float r = 0, g = 0, b = 0, a = 0;
         for (LUVColor c : colors) {
             r += c.luminance();
             g += c.u();
@@ -76,7 +69,7 @@ public class LUVColor extends BaseColor<LUVColor> {
 
 
     @Override
-    public LUVColor average(LUVColor color, float bias) {
+    public LUVColor mixWith(LUVColor color, float bias) {
         float i = 1 - bias;
         float r = this.luminance() * i + color.luminance() * bias;
         float g = this.u() * i + color.u() * bias;

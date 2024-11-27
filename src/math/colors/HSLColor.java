@@ -1,12 +1,9 @@
-package colors;
+package math.colors;
 
-import colors.test.PolarColor;
-
-import java.util.ArrayList;
 import java.util.Arrays;
 
-//like LAB but has circular values
-public class HSLColor extends PolarColor<HSLColor> {
+
+public class HSLColor extends BaseColor<HSLColor> {
 
     public HSLColor(float h, float s, float l, float a) {
         super(h, s, l, a);
@@ -14,7 +11,7 @@ public class HSLColor extends PolarColor<HSLColor> {
 
     @Override
     public String toString() {
-        return String.format("H: %s, S: %s, L %s", (int)(255*hue()), (int)(255*saturation()), (int)(255*lightness()));
+        return String.format("H: %s, S: %s, L %s", (int) (255 * hue()), (int) (255 * saturation()), (int) (255 * lightness()));
     }
 
     public float hue() {
@@ -29,9 +26,8 @@ public class HSLColor extends PolarColor<HSLColor> {
         return v2;
     }
 
-    @Override
-    public HSLColor with(float v1, float v2, float v3, float v4) {
-        return new HSLColor(v1,v2,v3,v4);
+    public float alpha() {
+        return v3;
     }
 
     public HSLColor withHue(float hue) {
@@ -61,27 +57,27 @@ public class HSLColor extends PolarColor<HSLColor> {
         return this;
     }
 
-    @Override
-    public HSLColor averageColors(HSLColor... colors) {
-        float size = colors.length + 1;
-        var list = new ArrayList<>(Arrays.stream(colors).map(HSLColor::hue).toList());
-        list.add(this.hue());
+    public static HSLColor averageColors(HSLColor... colors) {
+        float size = colors.length;
+        var list = Arrays.stream(colors).map(HSLColor::hue);
         Float[] hues = list.toArray(Float[]::new);
-        float s = this.saturation(), b = this.lightness(), a = this.alpha();
+        float s = 0, l = 0, a = 0;
         for (HSLColor c : colors) {
             s += c.saturation();
-            b += c.lightness();
+            l += c.lightness();
             a += c.alpha();
         }
-        return new HSLColor(averageAngles(hues), s / size, b / size, a / size);
+        return new HSLColor(averageAngles(hues), s / size, l / size, a / size);
     }
 
     @Override
-    public HSLColor average(HSLColor color, float bias) {
+    public HSLColor mixWith(HSLColor color, float bias) {
         float i = 1 - bias;
-        assert bias>=0 && bias<=1;
+        if (!(bias >= 0 && bias <= 1)) {
+            throw new IllegalArgumentException("bias must be between 0 and one");
+        }
         float h = weightedAverageAngles(this.hue(), color.hue(), bias);
-        while(h<0)++h;
+        while (h < 0) ++h;
         float s = this.saturation() * i + color.saturation() * bias;
         float l = this.lightness() * i + color.lightness() * bias;
         float a = this.alpha() * i + color.alpha() * bias;

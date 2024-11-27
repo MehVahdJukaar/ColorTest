@@ -1,11 +1,9 @@
-package colors;
+package math.colors;
 
-import colors.test.PolarColor;
-
-import java.util.ArrayList;
 import java.util.Arrays;
 
-public class HCLColor extends PolarColor<HCLColor> {
+//Polar LAB
+public class HCLColor extends BaseColor<HCLColor> {
 
     public HCLColor(float h, float c, float l, float a) {
         super(h, c, l, a);
@@ -28,9 +26,8 @@ public class HCLColor extends PolarColor<HCLColor> {
         return v2;
     }
 
-    @Override
-    public HCLColor with(float v1, float v2, float v3, float v4) {
-        return new HCLColor(v1,v2,v3,v4);
+    public float alpha() {
+        return v3;
     }
 
     public HCLColor withHue(float hue) {
@@ -59,25 +56,23 @@ public class HCLColor extends PolarColor<HCLColor> {
         return this;
     }
 
-    @Override
-    public HCLColor averageColors(HCLColor... colors) {
-        float size = colors.length + 1;
-        var list = new ArrayList<>(Arrays.stream(colors).map(HCLColor::hue).toList());
-        list.add(this.hue());
+    public static HCLColor averageColors(HCLColor... colors) {
+        float size = colors.length;
+        var list = Arrays.stream(colors).map(HCLColor::hue);
         Float[] hues = list.toArray(Float[]::new);
-        float s = this.chroma(), v = this.luminance(), a = this.alpha();
+        float cr = 0, l = 0, a = 0;
         for (HCLColor c : colors) {
-            s += c.chroma();
-            v += c.luminance();
+            cr += c.chroma();
+            l += c.luminance();
             a += c.alpha();
         }
-        return new HCLColor(averageAngles(hues), s / size, v / size, a / size);
+        return new HCLColor(averageAngles(hues), cr / size, l / size, a / size);
     }
 
     @Override
-    public HCLColor average(HCLColor color, float bias) {
+    public HCLColor mixWith(HCLColor color, float bias) {
         float i = 1 - bias;
-        float h = weightedAverageAngles(this.hue(), color.hue(),  bias);
+        float h = weightedAverageAngles(this.hue(), color.hue(), bias);
         while (h < 0) ++h;
         float c = this.chroma() * i + color.chroma() * bias;
         float b = this.luminance() * i + color.luminance() * bias;

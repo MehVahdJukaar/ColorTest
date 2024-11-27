@@ -1,12 +1,9 @@
-package colors;
+package math.colors;
 
-import colors.test.PolarColor;
-
-import java.util.ArrayList;
 import java.util.Arrays;
 
-//CIRCULAR LUV
-public class HCLVColor extends PolarColor<HCLVColor> {
+//Polar LUV
+public class HCLVColor extends BaseColor<HCLVColor> {
 
     public HCLVColor(float h, float c, float l, float a) {
         super(h, c, l, a);
@@ -31,11 +28,6 @@ public class HCLVColor extends PolarColor<HCLVColor> {
 
     public float alpha() {
         return v3;
-    }
-
-    @Override
-    public HCLVColor with(float v1, float v2, float v3, float v4) {
-        return new HCLVColor(v1,v2,v3,v4);
     }
 
     public HCLVColor withHue(float hue) {
@@ -64,13 +56,11 @@ public class HCLVColor extends PolarColor<HCLVColor> {
         return this;
     }
 
-    @Override
-    public HCLVColor averageColors(HCLVColor... colors) {
-        float size = colors.length + 1;
-        var list = new ArrayList<>(Arrays.stream(colors).map(HCLVColor::hue).toList());
-        list.add(this.hue());
+    public static HCLVColor averageColors(HCLVColor... colors) {
+        float size = colors.length;
+        var list = Arrays.stream(colors).map(HCLVColor::hue);
         Float[] hues = list.toArray(Float[]::new);
-        float s = this.chroma(), v = this.luminance(), a = this.alpha();
+        float s = 0, v = 0, a = 0;
         for (HCLVColor c : colors) {
             s += c.chroma();
             v += c.luminance();
@@ -80,9 +70,9 @@ public class HCLVColor extends PolarColor<HCLVColor> {
     }
 
     @Override
-    public HCLVColor average(HCLVColor color, float bias) {
+    public HCLVColor mixWith(HCLVColor color, float bias) {
         float i = 1 - bias;
-        float h = weightedAverageAngles(this.hue(), color.hue(),  bias);
+        float h = weightedAverageAngles(this.hue(), color.hue(), bias);
         while (h < 0) ++h;
         float c = this.chroma() * i + color.chroma() * bias;
         float b = this.luminance() * i + color.luminance() * bias;

@@ -1,42 +1,41 @@
-package colors.kmeans;
+package math.kmeans;
 
-import colors.BaseColor;
-import colors.LABColor;
-import colors.test.Palette;
+
+import math.colors.BaseColor;
+import math.colors.LABColor;
+import math.colors.RGBColor;
+import math.textures.Palette;
+import math.textures.PaletteColor;
 
 import java.util.*;
 
 public class DataSet<A> {
 
-    static class ColorPoint<C extends BaseColor<C>> implements IDataEntry<ColorPoint<C>> {
+    public static class ColorPoint implements IDataEntry<ColorPoint> {
 
         //how many pixels of this color there are. Same as having multiple of these color points
         private final int weight;
-        private final C color;
+        private final PaletteColor color;
         private int clusterNo;
 
-        public ColorPoint(C color, int weight) {
+        public ColorPoint(PaletteColor color) {
             this.color = color;
-            this.weight = weight;
-        }
-
-        public ColorPoint(C color) {
-            this(color,1);
+            this.weight = color.occurrence;
         }
 
         @Override
-        public IDataEntry<ColorPoint<C>> average(List<IDataEntry<ColorPoint<C>>> others) {
-            List<C> pixels = new ArrayList<>();
-            for(int i = 0; i<weight; i++){
-                pixels.add(this.color);
+        public IDataEntry<ColorPoint> average(List<IDataEntry<ColorPoint>> others) {
+            List<LABColor> pixels = new ArrayList<>();
+            for (int i = 0; i < weight; i++) {
+                pixels.add(this.color.lab());
             }
-            for(var c : others){
-                if(c == this)continue;
-                for(int i = 0; i<c.cast().weight; i++){
-                    pixels.add(c.cast().color);
+            for (var c : others) {
+                if (c == this) continue;
+                for (int i = 0; i < c.cast().weight; i++) {
+                    pixels.add(c.cast().color.lab());
                 }
             }
-            return new ColorPoint<>(BaseColor.mixColors(pixels));
+            return new ColorPoint(new PaletteColor(BaseColor.mixColors(pixels)));
         }
 
         public void setClusterNo(int clusterNo) {
@@ -48,16 +47,16 @@ public class DataSet<A> {
         }
 
         @Override
-        public float distTo(IDataEntry<ColorPoint<C>> a) {
-            return this.color.distTo(a.cast().color);
+        public float distTo(IDataEntry<ColorPoint> a) {
+            return this.color.lab().distTo(a.cast().color.lab());
         }
 
         @Override
-        public ColorPoint<C> cast() {
+        public ColorPoint cast() {
             return this;
         }
 
-        public C getColor() {
+        public PaletteColor getColor() {
             return color;
         }
     }
@@ -74,13 +73,8 @@ public class DataSet<A> {
         this.random = new Random(Objects.hash(this.colorPoints.get(0).distTo(this.colorPoints.get(this.colorPoints.size() - 1))));
     }
 
-    public static <C extends BaseColor<C>> DataSet<ColorPoint<C>> fromColors(List<C> colors) {
-        List<ColorPoint<C>> list = colors.stream().map(ColorPoint::new).toList();
-        return new DataSet<>(list);
-    }
-
-    public static DataSet<ColorPoint<LABColor>> fromPalette(Palette palette) {
-        return new DataSet<>(palette.getValues().stream().map(p -> new ColorPoint<>(p.lab(), p.occurrence)).toList());
+    public static DataSet<ColorPoint> fromPalette(Palette palette) {
+        return new DataSet<>(palette.getValues().stream().map(ColorPoint::new).toList());
     }
 
     public IDataEntry<A> calculateCentroid(int clusterNo) {
@@ -91,6 +85,9 @@ public class DataSet<A> {
                 //add colors to the same cluster
                 colorsInCluster.add(colorPoint);
             }
+        }
+        if (colorsInCluster.size() == 0) {
+            return (IDataEntry<A>) new ColorPoint(new PaletteColor(new RGBColor(0)));
         }
         return colorsInCluster.get(0).average(colorsInCluster);
     }
@@ -170,7 +167,7 @@ public class DataSet<A> {
                 }
             }
         }
-        throw new UnsupportedOperationException("aa");
+        throw new UnsupportedOperationException("Something bad happened");
     }
 
     public List<IDataEntry<A>> getColorPoints() {

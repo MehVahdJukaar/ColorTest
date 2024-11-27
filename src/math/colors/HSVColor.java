@@ -1,11 +1,8 @@
-package colors;
+package math.colors;
 
-import colors.test.PolarColor;
-
-import java.util.ArrayList;
 import java.util.Arrays;
 
-public class HSVColor extends PolarColor<HSVColor> {
+public class HSVColor extends BaseColor<HSVColor> {
 
     public HSVColor(float h, float s, float b, float a) {
         super(h, s, b, a);
@@ -34,11 +31,6 @@ public class HSVColor extends PolarColor<HSVColor> {
         return v3;
     }
 
-    @Override
-    public HSVColor with(float v1, float v2, float v3, float v4) {
-        return new HSVColor(v1,v2,v3,v4);
-    }
-
     public HSVColor withHue(float hue) {
         return new HSVColor(hue, saturation(), value(), alpha());
     }
@@ -65,13 +57,11 @@ public class HSVColor extends PolarColor<HSVColor> {
         return ColorSpaces.HSVtoRGB(this);
     }
 
-    @Override
-    public HSVColor averageColors(HSVColor... colors) {
-        float size = colors.length + 1;
-        var list = new ArrayList<>(Arrays.stream(colors).map(HSVColor::hue).toList());
-        list.add(this.hue());
+    public static HSVColor averageColors(HSVColor... colors) {
+        float size = colors.length;
+        var list = Arrays.stream(colors).map(HSVColor::hue);
         Float[] hues = list.toArray(Float[]::new);
-        float s = this.saturation(), v = this.value(), a = this.alpha();
+        float s = 0, v = 0, a = 0;
         for (HSVColor c : colors) {
             s += c.saturation();
             v += c.value();
@@ -81,7 +71,7 @@ public class HSVColor extends PolarColor<HSVColor> {
     }
 
     @Override
-    public HSVColor average(HSVColor color, float bias) {
+    public HSVColor mixWith(HSVColor color, float bias) {
         float i = 1 - bias;
         float h = weightedAverageAngles(this.hue(), color.hue(), bias);
         while (h < 0) ++h;

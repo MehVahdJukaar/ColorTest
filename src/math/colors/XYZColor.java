@@ -1,4 +1,4 @@
-package colors;
+package math.colors;
 
 public class XYZColor extends BaseColor<XYZColor> {
 
@@ -25,11 +25,6 @@ public class XYZColor extends BaseColor<XYZColor> {
 
     public float alpha() {
         return v3;
-    }
-
-    @Override
-    public XYZColor with(float v1, float v2, float v3, float v4) {
-        return new XYZColor(v1,v2,v3,v4);
     }
 
     public XYZColor withX(float x) {

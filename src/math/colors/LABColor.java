@@ -1,10 +1,10 @@
-package colors;
+package math.colors;
 
 public class LABColor extends BaseColor<LABColor> {
 
     public LABColor(float l, float a, float b, float alpha) {
         super(l, a, b, alpha);
-        //LAB can have a,b negative values
+        //LAB can have a,b negative getValues
     }
 
     @Override
@@ -33,11 +33,6 @@ public class LABColor extends BaseColor<LABColor> {
         return new LABColor(luminance, a(), b(), alpha());
     }
 
-    @Override
-    public LABColor with(float v1, float v2, float v3, float v4) {
-        return new LABColor(v1,v2,v3,v4);
-    }
-
     public LABColor withA(float a) {
         return new LABColor(luminance(), a, b(), alpha());
     }
@@ -50,9 +45,7 @@ public class LABColor extends BaseColor<LABColor> {
         return new LABColor(luminance(), a(), b(), alpha);
     }
 
-
-
-    public static LABColor averageColors1(LABColor... colors) {
+    public static LABColor averageColors(LABColor... colors) {
         float size = colors.length;
         float r = 0, g = 0, b = 0, a = 0;
         for (LABColor c : colors) {
@@ -74,9 +67,8 @@ public class LABColor extends BaseColor<LABColor> {
         return ColorSpaces.XYZtoRGB(ColorSpaces.LABtoXYZ(this));
     }
 
-
     @Override
-    public LABColor average(LABColor color, float bias) {
+    public LABColor mixWith(LABColor color, float bias) {
         float i = 1 - bias;
         float r = this.luminance() * i + color.luminance() * bias;
         float g = this.a() * i + color.a() * bias;
